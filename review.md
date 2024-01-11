@@ -14,13 +14,11 @@
 - 两遍
 
 $$
-  \begin{align*}
+\begin{align*}
       E.true &:= \text{newlabel} \\
       E.false &:= S.next \\
       S_1.next &:= S.next \\
-      S.code &:= \begin{align*}
-        E.code ~||~ gen(E.true ~ :) ~||~ S_1.code
-      \end{align*}
+      S.code &:= E.code ~||~ gen(E.true ~ :) ~||~ S_1.code
   \end{align*}
 $$
 
