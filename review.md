@@ -13,186 +13,186 @@
 
 - 两遍
 
-  $$
-    \begin{align*}
-        E.true &:= \text{newlabel} \\
-        E.false &:= S.next \\
-        S_1.next &:= S.next \\
-        S.code &:= \begin{align*}
-          E.code ~||~ gen(E.true ~ :) ~||~ S_1.code
-        \end{align*}
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      E.true &:= \text{newlabel} \\
+      E.false &:= S.next \\
+      S_1.next &:= S.next \\
+      S.code &:= \begin{align*}
+        E.code ~||~ gen(E.true ~ :) ~||~ S_1.code
+      \end{align*}
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to if~E~then~M~S_1 \\
-    &\{ \\
-    &backpatch(E.truelist, M.quad); \\
-    &S.nextlist = merge(E.falselist, S_1.nextlist) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \}
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to if~E~then~M~S_1 \\
+  &\{ \\
+  &backpatch(E.truelist, M.quad); \\
+  &S.nextlist = merge(E.falselist, S_1.nextlist) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \}
+  \end{align*}
+$$
 
 ### $ S \to if~E~then~S_1~else~S_2 $
 
 - 两遍
 
-  $$
-    \begin{align*}
-        E.true &:= \text{newlabel} \\
-        E.false &:= \text{newlabel} \\
-        S_1.next &:= S.next \\
-        S_2.next &:= S.next \\
-        S.code &:= E.code ~||~ \\
-        &gen(E.true~:) ~||~ S_1.code ~||~ gen(goto~S_1.next) ~||~ \\
-        &gen(E.false~:) ~||~ S_2.code ~||~ gen(goto~S_2.next) \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      E.true &:= \text{newlabel} \\
+      E.false &:= \text{newlabel} \\
+      S_1.next &:= S.next \\
+      S_2.next &:= S.next \\
+      S.code &:= E.code ~||~ \\
+      &gen(E.true~:) ~||~ S_1.code ~||~ gen(goto~S_1.next) ~||~ \\
+      &gen(E.false~:) ~||~ S_2.code ~||~ gen(goto~S_2.next) \\
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to if~E~then~M_1~S_1~N~else~M_2~S_2 \\
-    &\{ \\
-      &backpatch(E.truelist, M_1.quad); \\
-      &backpatch(E.falselist, M_2.quad); \\
-      &S.nextlist = merge(S_1.nextlist, N.nextlist, S_2.nextlist) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \} \\
-    N &\to \epsilon \\
-    &\{ \\
-      &N.quad = nextquad \\
-      &emit(j, -, -, -) \\
-    &\} \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to if~E~then~M_1~S_1~N~else~M_2~S_2 \\
+  &\{ \\
+    &backpatch(E.truelist, M_1.quad); \\
+    &backpatch(E.falselist, M_2.quad); \\
+    &S.nextlist = merge(S_1.nextlist, N.nextlist, S_2.nextlist) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \} \\
+  N &\to \epsilon \\
+  &\{ \\
+    &N.quad = nextquad \\
+    &emit(j, -, -, -) \\
+  &\} \\
+  \end{align*}
+$$
 
 ### $ S \to while~E~do~S_1 $
 
 - 两遍
 
-  $$
-    \begin{align*}
-        S.begin &:= \text{newlabel} \\
-        E.true &:= \text{newlabel} \\
-        E.false &:= S.next \\
-        S_1.next &:= S.begin \\
-        S.code &:= gen(S.begin~:) ~||~ E.code ~||~ \\
-          &gen(E.true~:) ~||~ S_1.code ~||~ gen(goto~S.begin)
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      S.begin &:= \text{newlabel} \\
+      E.true &:= \text{newlabel} \\
+      E.false &:= S.next \\
+      S_1.next &:= S.begin \\
+      S.code &:= gen(S.begin~:) ~||~ E.code ~||~ \\
+        &gen(E.true~:) ~||~ S_1.code ~||~ gen(goto~S.begin)
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to while~M_1~E~do~M_2~S_1 \\
-    &\{ \\
-      &backpatch(E.truelist, M_2.quad); \\
-      &backpatch(S_1.nextlist, M_1.quad); \\
-      &S.nextlist = E.falselist; \\
-      &emit(j, -, -, M_1.quad) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \} \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to while~M_1~E~do~M_2~S_1 \\
+  &\{ \\
+    &backpatch(E.truelist, M_2.quad); \\
+    &backpatch(S_1.nextlist, M_1.quad); \\
+    &S.nextlist = E.falselist; \\
+    &emit(j, -, -, M_1.quad) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \} \\
+  \end{align*}
+$$
 
 ### $ S \to do~S_1~while~E $
 
 - 两遍
 
-  $$
-    \begin{align*}
-        S.begin &= newlabel \\
-        E.begin &= newlabel \\
-        E.true &= newlabel \\
-        S_1.next &= E.begin \\
-        S.code &= gen(S.begin~:) ~||~ S_1.code ~||~ gen(goto~E.begin) ~||~ \\
-          &gen(E.begin~:) ~||~ E.code ~||~ \\
-          &gen(E.true~:) ~||~ gen(goto~S.begin)
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      S.begin &= newlabel \\
+      E.begin &= newlabel \\
+      E.true &= newlabel \\
+      S_1.next &= E.begin \\
+      S.code &= gen(S.begin~:) ~||~ S_1.code ~||~ gen(goto~E.begin) ~||~ \\
+        &gen(E.begin~:) ~||~ E.code ~||~ \\
+        &gen(E.true~:) ~||~ gen(goto~S.begin)
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to do~M_1~S_1~while~M_2~E \\
-    &\{ \\
-      &backpatch(S_1.nextlist, M_2.quad); \\
-      &backpatch(E.truelist, M_1.quad); \\
-      &S.nextlist = E.falselist; \\
-      &emit(j, -, -, M_1.quad) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \} \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to do~M_1~S_1~while~M_2~E \\
+  &\{ \\
+    &backpatch(S_1.nextlist, M_2.quad); \\
+    &backpatch(E.truelist, M_1.quad); \\
+    &S.nextlist = E.falselist; \\
+    &emit(j, -, -, M_1.quad) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \} \\
+  \end{align*}
+$$
 
 ### $ S \to repeat~until~E~do~S_1 $
 
 - 两遍
 
-  $$
-    \begin{align*}
-        S.begin &:= \text{newlabel} \\
-        E.false &:= \text{newlabel} \\
-        E.true &:= S.next \\
-        S_1.next &:= S.begin \\
-        S.code &:= gen(S.begin~:) ~||~ E.code ~||~ \\
-          &gen(E.false~:) ~||~ S_1.code ~||~ gen(goto~S.begin)
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      S.begin &:= \text{newlabel} \\
+      E.false &:= \text{newlabel} \\
+      E.true &:= S.next \\
+      S_1.next &:= S.begin \\
+      S.code &:= gen(S.begin~:) ~||~ E.code ~||~ \\
+        &gen(E.false~:) ~||~ S_1.code ~||~ gen(goto~S.begin)
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to repeat~until~M_1~E~do~M_2~S_1 \\
-    &\{ \\
-      &backpatch(E.falselist, M_2.quad); \\
-      &backpatch(S_1.nextlist, M_1.quad); \\
-      &S.nextlist = E.truelist; \\
-      &emit(j, -, -, M_1.quad) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \} \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to repeat~until~M_1~E~do~M_2~S_1 \\
+  &\{ \\
+    &backpatch(E.falselist, M_2.quad); \\
+    &backpatch(S_1.nextlist, M_1.quad); \\
+    &S.nextlist = E.truelist; \\
+    &emit(j, -, -, M_1.quad) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \} \\
+  \end{align*}
+$$
 
 ### $ S \to repeat~S_1~until~E $
 
 - 两遍
 
-  $$
-    \begin{align*}
-        S.begin &= newlabel \\
-        E.begin &= newlabel \\
-        E.false &= newlabel \\
-        S_1.next &= E.begin \\
-        S.code &= gen(S.begin~:) ~||~ S_1.code ~||~ gen(goto~E.begin) ~||~ \\
-          &gen(E.begin~:) ~||~ E.code ~||~ \\
-          &gen(E.false~:) ~||~ gen(goto~S.begin)
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+      S.begin &= newlabel \\
+      E.begin &= newlabel \\
+      E.false &= newlabel \\
+      S_1.next &= E.begin \\
+      S.code &= gen(S.begin~:) ~||~ S_1.code ~||~ gen(goto~E.begin) ~||~ \\
+        &gen(E.begin~:) ~||~ E.code ~||~ \\
+        &gen(E.false~:) ~||~ gen(goto~S.begin)
+  \end{align*}
+$$
 
 - 一遍
 
-  $$
-    \begin{align*}
-    S &\to repeat~M_1~S_1~while~M_2~E \\
-    &\{ \\
-      &backpatch(S_1.nextlist, M_2.quad); \\
-      &backpatch(E.falselist, M_1.quad); \\
-      &S.nextlist = E.truelist; \\
-      &emit(j, -, -, M_1.quad) \\
-    &\} \\
-    M &\to \epsilon ~ \{ M.quad = nextquad \} \\
-    \end{align*}
-  $$
+$$
+  \begin{align*}
+  S &\to repeat~M_1~S_1~while~M_2~E \\
+  &\{ \\
+    &backpatch(S_1.nextlist, M_2.quad); \\
+    &backpatch(E.falselist, M_1.quad); \\
+    &S.nextlist = E.truelist; \\
+    &emit(j, -, -, M_1.quad) \\
+  &\} \\
+  M &\to \epsilon ~ \{ M.quad = nextquad \} \\
+  \end{align*}
+$$
 
 ### $ S \to for(E_1;E_2;E_3)~S_1 $
 
