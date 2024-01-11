@@ -1,0 +1,5 @@
+rightarrow
+simeq
+leftrightarrows
+coloncolon
+coloncolon
